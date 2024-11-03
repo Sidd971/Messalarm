@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tasks & Reminders</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database-compat.js"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-links">
+            <a href="index.html">Messages</a>
+            <a href="tasks.html" class="active">Tasks</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div id="loginPage">
+            <h1>Tasks & Reminders</h1>
+            <p>Enter password to access your tasks</p>
+            <input type="password" id="password" placeholder="Enter password">
+            <button onclick="login()">Login</button>
+        </div>
+
+        <div id="tasksPage">
+            <h1>Tasks</h1>
+            <div class="task-input-area">
+                <input type="text" id="taskInput" placeholder="New task...">
+                <input type="datetime-local" id="taskDueDate">
+                <button onclick="addTask()">Add Task</button>
+            </div>
+            <div class="task-filters">
+                <button onclick="filterTasks('all')" class="active">All</button>
+                <button onclick="filterTasks('active')">Active</button>
+                <button onclick="filterTasks('completed')">Completed</button>
+            </div>
+            <div id="tasksList"></div>
+        </div>
+    </div>
+    <script src="auth.js"></script>
+    <script src="tasks.js"></script>
+</body>
+</html>
