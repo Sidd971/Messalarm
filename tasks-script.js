@@ -1,96 +1,111 @@
-let tasksRef;
-let currentFilter = 'all';
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tasks</title>
+    <style>
+        body {
+            background: #000000;
+            color: #ffffff;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
 
-document.addEventListener('DOMContentLoaded', function() {
-    if (checkAuth()) {
-        tasksRef = database.ref('tasks/' + hashPassword(currentPassword));
-        loadTasks();
-    }
+        .nav-links {
+            margin-bottom: 20px;
+        }
 
-    document.getElementById('taskInput').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') addTask();
-    });
-});
+        .nav-links a {
+            color: #ffffff;
+            text-decoration: none;
+            margin-right: 15px;
+        }
 
-function addTask() {
-    const taskInput = document.getElementById('taskInput');
-    const dueDateInput = document.getElementById('taskDueDate');
-    const taskText = taskInput.value.trim();
-    const dueDate = dueDateInput.value ? new Date(dueDateInput.value).getTime() : null;
-    
-    if (taskText) {
-        const taskObj = {
-            text: taskText,
-            completed: false,
-            createdAt: Date.now(),
-            dueDate: dueDate,
-        };
+        .nav-links a:hover {
+            text-decoration: underline;
+        }
 
-        tasksRef.push(taskObj);
-        taskInput.value = '';
-        dueDateInput.value = '';
-    }
-}
+        h1 {
+            color: #ffffff;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
 
-function loadTasks() {
-    tasksRef.on('value', (snapshot) => {
-        const tasks = [];
-        snapshot.forEach((childSnapshot) => {
-            const task = childSnapshot.val();
-            tasks.push({ ...task, id: childSnapshot.key });
-        });
+        input[type="password"],
+        input[type="text"] {
+            background: #333;
+            border: 1px solid #444;
+            color: #ffffff;
+            padding: 5px;
+            margin: 5px 0;
+            width: 200px;
+        }
 
-        displayTasks(tasks);
-    });
-}
+        button {
+            background: #444;
+            color: #ffffff;
+            border: none;
+            padding: 5px 10px;
+            margin: 5px 0;
+            cursor: pointer;
+        }
 
-function displayTasks(tasks) {
-    const tasksList = document.getElementById('tasksList');
-    tasksList.innerHTML = '';
+        button:hover {
+            background: #555;
+        }
 
-    tasks
-        .sort((a, b) => {
-            if (a.completed === b.completed) {
-                return b.createdAt - a.createdAt;
-            }
-            return a.completed ? 1 : -1;
-        })
-        .filter(task => {
-            if (currentFilter === 'active') return !task.completed;
-            if (currentFilter === 'completed') return task.completed;
-            return true;
-        })
-        .forEach(task => {
-            const taskDiv = document.createElement('div');
-            taskDiv.className = `task ${task.completed ? 'completed' : ''}`;
-            
-            const dueDate = task.dueDate ? new Date(task.dueDate).toLocaleString() : 'No due date';
-            
-            taskDiv.innerHTML = `
-                <input type="checkbox" 
-                    ${task.completed ? 'checked' : ''} 
-                    onchange="toggleTask('${task.id}', this.checked)">
-                <span class="task-text">${task.text}</span>
-                <span class="task-due-date">Due: ${dueDate}</span>
-                <button onclick="deleteTask('${task.id}')" class="delete-btn">Delete</button>
-            `;
-            
-            tasksList.appendChild(taskDiv);
-        });
-}
+        #tasksPage {
+            display: none;
+        }
 
-function toggleTask(taskId, completed) {
-    tasksRef.child(taskId).update({ completed });
-}
+        .task {
+            background: #333;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
 
-function deleteTask(taskId) {
-    tasksRef.child(taskId).remove();
-}
+        .task.completed {
+            opacity: 0.7;
+        }
 
-function filterTasks(filter) {
-    currentFilter = filter;
-    document.querySelectorAll('.task-filters button').forEach(btn => {
-        btn.classList.toggle('active', btn.innerText.toLowerCase() === filter);
-    });
-    loadTasks();
-}
+        .task.completed .task-text {
+            text-decoration: line-through;
+        }
+
+        #tasksList {
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="nav-links">
+        <a href="index.html">Messages</a>
+        <a href="tasks.html">Tasks</a>
+    </div>
+
+    <div id="loginPage">
+        <h1>Tasks</h1>
+        <p>Enter password to access your tasks</p>
+        <input type="password" id="password" placeholder="Enter password">
+        <button onclick="login()">Login</button>
+    </div>
+
+    <div id="tasksPage">
+        <h1>Tasks</h1>
+        <div>
+            <input type="text" id="taskInput" placeholder="New task...">
+            <button onclick="addTask()">Add Task</button>
+        </div>
+        <div id="tasksList"></div>
+    </div>
+
+    <script src="auth.js"></script>
+    <script src="tasks.js"></script>
+</body>
+</html>
